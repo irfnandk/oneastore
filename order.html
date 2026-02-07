@@ -8,7 +8,13 @@
 
 <style>
 *{box-sizing:border-box;font-family:Inter,sans-serif}
-body{margin:0;background:#f8fafc;display:flex;justify-content:center;padding:30px 0}
+body{
+  margin:0;
+  background:#f8fafc;
+  display:flex;
+  justify-content:center;
+  padding:30px 0
+}
 .container{width:390px;padding:0 16px}
 .card{
   background:#fff;
@@ -16,7 +22,10 @@ body{margin:0;background:#f8fafc;display:flex;justify-content:center;padding:30p
   padding:24px;
   box-shadow:0 25px 50px rgba(0,0,0,.08)
 }
-h2{text-align:center;margin-bottom:18px}
+h2{
+  text-align:center;
+  margin-bottom:18px
+}
 input,textarea{
   width:100%;
   padding:14px;
@@ -25,7 +34,14 @@ input,textarea{
   margin-bottom:12px;
   font-size:14px
 }
-textarea{height:90px;resize:none}
+textarea{
+  height:90px;
+  resize:none
+}
+.tip{
+  background:#f1f5f9;
+  border:1px dashed #cbd5f5;
+}
 button{
   width:100%;
   padding:16px;
@@ -34,9 +50,15 @@ button{
   background:#000;
   color:#fff;
   font-size:15px;
-  font-weight:600
+  font-weight:600;
+  cursor:pointer
 }
-.note{text-align:center;font-size:12px;color:#64748b;margin-top:10px}
+.note{
+  text-align:center;
+  font-size:12px;
+  color:#64748b;
+  margin-top:10px
+}
 </style>
 </head>
 
@@ -50,6 +72,10 @@ button{
       <input id="barang" placeholder="Barang" required>
       <input id="jumlah" type="number" placeholder="Jumlah" required>
       <textarea id="catatan" placeholder="Catatan (opsional)"></textarea>
+
+      <!-- TIP -->
+      <input id="tip" type="number" class="tip" placeholder="Tip buat admin (opsional hehe )">
+
       <button type="submit">Kirim Pesanan</button>
     </form>
 
@@ -61,31 +87,32 @@ button{
 orderForm.addEventListener("submit",e=>{
   e.preventDefault();
 
-  const receipt=
+  const tipValue = tip.value ? `Rp ${Number(tip.value).toLocaleString("id-ID")}` : "-";
+
+  const receipt =
 `PESANAN ONEA STORE — GESIT RUN
 
 Nama    : ${nama.value}
 Barang  : ${barang.value}
 Jumlah  : ${jumlah.value}
-Catatan : ${catatan.value||"-"}
+Catatan : ${catatan.value || "-"}
+
+Tip     : ${tipValue}
 
 Metode  : Titip Beli
 Ambil   : Finish IKIP PGRI Bojonegoro
 Status  : Menunggu Pengambilan`;
 
-  sessionStorage.setItem("receipt",receipt);
-  sessionStorage.setItem("orderId","ONEA STORE-"+Date.now());
+  sessionStorage.setItem("receipt", receipt);
+  sessionStorage.setItem("orderId", "ONEA STORE-" + Date.now());
 
   window.open(
-    "https://wa.me/6285646755439?text="+encodeURIComponent(receipt),
+    "https://wa.me/6285646755439?text=" + encodeURIComponent(receipt),
     "_blank"
   );
 
-  location.href="receipt.html";
+  location.href = "receipt.html";
 });
 </script>
 </body>
 </html>
-
-
-
