@@ -17,60 +17,103 @@ body{
   background:#f8fafc;
   display:flex;
   justify-content:center;
-  align-items:center;
-  min-height:100vh
+  padding:40px 0
+}
+.container{
+  width:390px;
+  padding:0 16px
 }
 .card{
   background:#fff;
   border-radius:26px;
-  padding:40px;
+  padding:32px 22px;
   box-shadow:0 30px 60px rgba(0,0,0,.08);
-  animation:fadeUp .7s ease;
-  display:flex;
-  justify-content:center;
-  align-items:center
+  text-align:center;
+  animation:fadeUp .7s ease
 }
 
-/* ANIMASI CARD */
 @keyframes fadeUp{
-  from{
-    opacity:0;
-    transform:translateY(24px)
-  }
-  to{
-    opacity:1;
-    transform:none
-  }
+  from{opacity:0;transform:translateY(24px)}
+  to{opacity:1;transform:none}
 }
 
 /* LOGO */
 .logo{
-  width:140px;
-  height:140px;
+  width:120px;
+  height:120px;
   object-fit:cover;
   border-radius:50%;
-  box-shadow:0 18px 36px rgba(0,0,0,.25);
+  margin-bottom:18px;
+  box-shadow:0 16px 34px rgba(0,0,0,.22);
   animation:logoFade .9s ease
 }
-
 @keyframes logoFade{
-  from{
-    opacity:0;
-    transform:scale(.85)
-  }
-  to{
-    opacity:1;
-    transform:scale(1)
-  }
+  from{opacity:0;transform:scale(.85)}
+  to{opacity:1;transform:scale(1)}
+}
+
+p{
+  color:#64748b;
+  font-size:14px;
+  line-height:1.6
+}
+.flow{
+  display:flex;
+  justify-content:space-between;
+  margin:24px 0;
+  font-size:12px;
+  color:#475569
+}
+.flow div{width:30%}
+button{
+  width:100%;
+  padding:16px;
+  border:none;
+  border-radius:18px;
+  background:#000;
+  color:#fff;
+  font-size:15px;
+  font-weight:600;
+  cursor:pointer;
+  transition:.25s
+}
+button:hover{
+  transform:translateY(-2px);
+  box-shadow:0 12px 24px rgba(0,0,0,.25)
+}
+footer{
+  margin-top:18px;
+  font-size:12px;
+  color:#94a3b8
 }
 </style>
 </head>
 
 <body>
+<div class="container">
+  <div class="card">
 
-<div class="card">
-  <img src="logo.jpg" alt="Logo ONEA STORE" class="logo">
+    <!-- LOGO SAJA (TANPA JUDUL) -->
+    <img src="logo.jpg" alt="Logo ONEA STORE" class="logo">
+
+    <p>
+      Layanan titip beli cepat saat Gesit Run.<br>
+      Pesan sekarang, ambil di finish.
+    </p>
+
+    <div class="flow">
+      <div>Pesan</div>
+      <div>Kami belikan</div>
+      <div>Ambil di stand</div>
+    </div>
+
+    <button onclick="location.href='order.html'">
+      Pesan Sekarang
+    </button>
+
+    <footer>Finish • IKIP PGRI Bojonegoro</footer>
+
+  </div>
 </div>
-
 </body>
 </html>
