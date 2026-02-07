@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KORA</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;font-family:Inter,sans-serif}
+body{
+  margin:0;
+  background:#f8fafc;
+  display:flex;
+  justify-content:center;
+  padding:40px 0
+}
+.container{width:390px;padding:0 16px}
+.card{
+  background:#fff;
+  border-radius:26px;
+  padding:30px 22px;
+  box-shadow:0 30px 60px rgba(0,0,0,.08);
+  text-align:center;
+  animation:fade .6s ease
+}
+@keyframes fade{from{opacity:0;transform:translateY(20px)}to{opacity:1}}
+h1{margin:0;font-size:26px;font-weight:700}
+p{color:#64748b;font-size:14px;line-height:1.6}
+.flow{
+  display:flex;
+  justify-content:space-between;
+  margin:24px 0;
+  font-size:12px;
+  color:#475569
+}
+.flow div{width:30%}
+button{
+  width:100%;
+  padding:16px;
+  border:none;
+  border-radius:18px;
+  background:#000;
+  color:#fff;
+  font-size:15px;
+  font-weight:600;
+  cursor:pointer
+}
+footer{
+  margin-top:18px;
+  font-size:12px;
+  color:#94a3b8
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+  <div class="card">
+    <h1>KORA</h1>
+    <p>Layanan titip beli cepat saat Gesit Run.<br>Pesan sekarang, ambil di finish.</p>
+
+    <div class="flow">
+      <div>📝 Pesan</div>
+      <div>🏃‍♂️ Kami belikan</div>
+      <div>📍 Ambil di finish</div>
+    </div>
+
+    <button onclick="location.href='order.html'">Pesan Sekarang</button>
+
+    <footer>Finish • IKIP PGRI Bojonegoro</footer>
+  </div>
+</div>
+</body>
+</html>

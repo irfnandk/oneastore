@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pesan — KORA</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;font-family:Inter,sans-serif}
+body{margin:0;background:#f8fafc;display:flex;justify-content:center;padding:30px 0}
+.container{width:390px;padding:0 16px}
+.card{
+  background:#fff;
+  border-radius:26px;
+  padding:24px;
+  box-shadow:0 25px 50px rgba(0,0,0,.08)
+}
+h2{text-align:center;margin-bottom:18px}
+input,textarea{
+  width:100%;
+  padding:14px;
+  border-radius:16px;
+  border:1px solid #e5e7eb;
+  margin-bottom:12px;
+  font-size:14px
+}
+textarea{height:90px;resize:none}
+button{
+  width:100%;
+  padding:16px;
+  border:none;
+  border-radius:18px;
+  background:#000;
+  color:#fff;
+  font-size:15px;
+  font-weight:600
+}
+.note{text-align:center;font-size:12px;color:#64748b;margin-top:10px}
+</style>
+</head>
+
+<body>
+<div class="container">
+  <div class="card">
+    <h2>Detail Pesanan</h2>
+
+    <form id="orderForm">
+      <input id="nama" placeholder="Nama" required>
+      <input id="barang" placeholder="Barang" required>
+      <input id="jumlah" type="number" placeholder="Jumlah" required>
+      <textarea id="catatan" placeholder="Catatan (opsional)"></textarea>
+      <button type="submit">Kirim Pesanan</button>
+    </form>
+
+    <div class="note">Ambil di Finish IKIP PGRI Bojonegoro</div>
+  </div>
+</div>
+
+<script>
+orderForm.addEventListener("submit",e=>{
+  e.preventDefault();
+
+  const receipt=
+`PESANAN KORA — GESIT RUN
+
+Nama    : ${nama.value}
+Barang  : ${barang.value}
+Jumlah  : ${jumlah.value}
+Catatan : ${catatan.value||"-"}
+
+Metode  : Titip Beli
+Ambil   : Finish IKIP PGRI Bojonegoro
+Status  : Menunggu Pengambilan`;
+
+  sessionStorage.setItem("receipt",receipt);
+  sessionStorage.setItem("orderId","KORA-"+Date.now());
+
+  window.open(
+    "https://wa.me/6285646755439?text="+encodeURIComponent(receipt),
+    "_blank"
+  );
+
+  location.href="receipt.html";
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bukti Pesanan — KORA</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;font-family:Inter,sans-serif}
+body{margin:0;background:#f8fafc;display:flex;justify-content:center;padding:30px 0}
+.container{width:390px;padding:0 16px}
+.card{
+  background:#fff;
+  border-radius:26px;
+  padding:24px;
+  box-shadow:0 25px 50px rgba(0,0,0,.08);
+  animation:fade .5s ease
+}
+@keyframes fade{from{opacity:0;transform:translateY(20px)}to{opacity:1}}
+h2{text-align:center}
+.runner{text-align:center;font-size:34px;animation:run 1.2s infinite}
+@keyframes run{0%{transform:translateX(-10px)}50%{transform:translateX(10px)}100%{transform:translateX(-10px)}}
+pre{
+  background:#f8fafc;
+  padding:16px;
+  border-radius:18px;
+  font-size:14px;
+  line-height:1.6
+}
+.qr{text-align:center;margin:18px 0}
+.status{
+  background:#ecfeff;
+  color:#0369a1;
+  text-align:center;
+  font-size:13px;
+  padding:10px;
+  border-radius:14px
+}
+footer{text-align:center;font-size:12px;color:#64748b;margin-top:14px}
+</style>
+</head>
+
+<body>
+<div class="container">
+  <div class="card">
+    <h2>KORA</h2>
+    <div class="runner">🏃‍♂️</div>
+
+    <pre id="data"></pre>
+
+    <div class="qr">
+      <img id="qr" width="160">
+    </div>
+
+    <div class="status">Tunjukkan QR ini saat pengambilan</div>
+
+    <footer>Finish • IKIP PGRI Bojonegoro</footer>
+  </div>
+</div>
+
+<script>
+const text=sessionStorage.getItem("receipt")||"-";
+const id=sessionStorage.getItem("orderId")||"KORA";
+data.innerText=text;
+qr.src="https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl="+encodeURIComponent(id);
+</script>
+</body>
+</html>
