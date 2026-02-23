@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Manajemen Iuran Kas - Versi Lengkap</title>
+<title>Manajemen Iuran Kas - Pembayaran Asli & QRIS</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet" />
 <style>
   body {
@@ -67,64 +67,51 @@
     border-radius: 4px;
     cursor: pointer;
   }
-  /* Untuk statistik dan ringkasan */
-  .stats {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
+  /* Responsif */
+  @media(max-width: 768px){
+    .stats {
+      flex-direction: column;
+    }
   }
-  .stat-box {
-    flex: 1;
-    min-width: 150px;
-    background: #e0f2fe;
-    padding: 15px;
-    border-radius: 12px;
-    text-align: center;
-  }
-  .stat-box h3 {
-    margin: 0;
-    font-size: 1.2em;
+  /* QR Code Image */
+  #qrisCode {
+    margin-top: 10px;
+    display: none;
+    max-width: 200px;
   }
 </style>
 </head>
 <body>
 
-<h1>Manajemen Iuran Kas - Versi Lengkap</h1>
+<h1>Manajemen Iuran Kas - Pembayaran Asli & QRIS</h1>
 
-<!-- Manajemen Anggota -->
-<div class="section">
-  <div class="card">
-    <h2>Daftar dan Kelola Anggota</h2>
-    <input type="text" id="namaAnggota" placeholder="Nama Anggota Baru" />
-    <button onclick="tambahAnggota()">Tambah Anggota</button>
-    <table id="tabelAnggota">
-      <thead>
-        <tr>
-          <th>Nama</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-</div>
-
-<!-- Form Pembayaran -->
-<div class="section">
+<!-- Input Pembayaran -->
+<div class="section" id="sectionPembayaran">
   <div class="card">
     <h2>Input Pembayaran</h2>
-    <select id="selectAnggota">
+    <select id="selectAnggota" onchange="cekTunggakan()">
       <option value="">Pilih Anggota</option>
     </select>
+    <div id="tunggakanInfo" style="margin-top:10px; color:red;"></div>
     <input type="number" id="jumlahBayar" placeholder="Jumlah (Rp)" />
+    <select id="kategoriIuran">
+      <option value="Rutin">Kas Rutin</option>
+      <option value="Pribadi">Kas Pribadi</option>
+      <option value="Lainnya">Lainnya</option>
+    </select>
     <button onclick="prosesPembayaran()">Bayar</button>
+    <!-- QRIS Code -->
+    <div id="qrisContainer" style="margin-top:15px;">
+      <p>Atau bayar via QRIS:</p>
+      <img id="qrisCode" src="" alt="QRIS" />
+    </div>
   </div>
 </div>
 
-<!-- Statistik dan Ringkasan -->
-<div class="section">
+<!-- Statistik dan Pengingat -->
+<div class="section" id="sectionStatistik">
   <div class="card">
-    <h2>Statistik dan Ringkasan</h2>
+    <h2>Statistik dan Pengingat</h2>
     <div class="stats">
       <div class="stat-box">
         <h3 id="totalPembayaran">Rp 0</h3>
@@ -142,13 +129,13 @@
   </div>
 </div>
 
-<!-- Laporan & Pengelolaan Transaksi -->
-<div class="section">
+<!-- Laporan & Pengelolaan -->
+<div class="section" id="sectionLaporan">
   <div class="card">
     <h2>Laporan Pembayaran & Pengelolaan</h2>
-    <div style="display:flex; gap:10px; margin-bottom:10px;">
+    <div style="margin-bottom:10px;">
       <button onclick="resetData()">Reset Data</button>
-      <button onclick="exportLaporanCSV()">Export Seluruh Data</button>
+      <button onclick="exportLaporanCSV()">Export Data Lengkap</button>
     </div>
     <div>
       <label for="filterBulan">Filter Bulan:</label>
@@ -159,6 +146,7 @@
         <tr>
           <th>Tanggal</th>
           <th>Anggota</th>
+          <th>Kategori</th>
           <th>Jumlah (Rp)</th>
           <th>Aksi</th>
         </tr>
@@ -172,6 +160,41 @@
   // Data utama
   let anggota = JSON.parse(localStorage.getItem('anggota')) || [];
   let pembayaran = JSON.parse(localStorage.getItem('pembayaran')) || [];
+
+  // Fungsi cek tunggakan
+  function cekTunggakan() {
+    const anggotaPilih = document.getElementById('selectAnggota').value;
+    const infoDiv = document.getElementById('tunggakanInfo');
+    const qrisImg = document.getElementById('qrisCode');
+
+    if(!anggotaPilih){
+      infoDiv.innerText='';
+      qrisImg.style.display='none';
+      return;
+    }
+
+    // Hitung total pembayaran anggota
+    const totalPaid= pembayaran
+      .filter(p => p.anggota===anggotaPilih)
+      .reduce((acc,p)=>acc+p.jumlah,0);
+
+    // Asumsi iuran rutin per bulan Rp 50.000
+    const iuranPerBulan=50000;
+
+    // Hitung tunggakan (misal: pembayaran belum sesuai target)
+    // Untuk simplifikasi, kita anggap tunggakan jika total bayar kurang dari Rp 50.000
+    if(totalPaid < iuranPerBulan){
+      const tunggakan= iuranPerBulan - totalPaid;
+      infoDiv.innerText=`Tunggakan Rp ${tunggakan}. Pembayaran via QRIS akan muncul jika ingin bayar kekurangan.`;
+      
+      // Generate QRIS jika ada tunggakan
+      qrisImg.src='https://api.qrserver.com/v1/create-qr-code/?data=Bayar%20tunggakan%20Rp%20'+tunggakan+'&size=200x200';
+      qrisImg.style.display='block';
+    } else {
+      infoDiv.innerText='Tidak ada tunggakan.';
+      qrisImg.style.display='none';
+    }
+  }
 
   // Fungsi Tambah Anggota
   function tambahAnggota() {
@@ -189,10 +212,8 @@
     document.getElementById('namaAnggota').value='';
     renderDaftarAnggota();
     renderPilihanAnggota();
-    renderStatistik();
   }
 
-  // Render daftar anggota
   function renderDaftarAnggota() {
     const tbody = document.querySelector('#tabelAnggota tbody');
     tbody.innerHTML='';
@@ -214,27 +235,22 @@
       localStorage.setItem('anggota', JSON.stringify(anggota));
       renderDaftarAnggota();
       renderPilihanAnggota();
-      renderStatistik();
     }
   }
 
   function editAnggota(nama) {
-    const newNama = prompt('Edit nama anggota:', nama);
+    const newNama=prompt('Edit nama:',nama);
     if(newNama){
       newNama.trim();
       if(newNama && !anggota.includes(newNama)){
-        // Update di array
-        anggota = anggota.map(a => a===nama ? newNama : a);
+        anggota=anggota.map(a=>a===nama?newNama:a);
         localStorage.setItem('anggota', JSON.stringify(anggota));
         renderDaftarAnggota();
         renderPilihanAnggota();
-      } else {
-        alert('Nama tidak valid atau sudah terdaftar!');
       }
     }
   }
 
-  // Render pilihan anggota di form pembayaran
   function renderPilihanAnggota() {
     const select = document.getElementById('selectAnggota');
     select.innerHTML='<option value="">Pilih Anggota</option>';
@@ -247,12 +263,25 @@
   function prosesPembayaran() {
     const anggotaPilih = document.getElementById('selectAnggota').value;
     const jumlah = parseInt(document.getElementById('jumlahBayar').value);
+    const kategori= document.getElementById('kategoriIuran').value;
     if(!anggotaPilih || isNaN(jumlah) || jumlah<=0){
       alert('Isi data dengan benar!');
       return;
     }
-    const now = new Date();
-    pembayaran.push({anggota: anggotaPilih, jumlah, tanggal: now});
+
+    // Jika anggota punya tunggakan, tampilkan QRIS
+    const totalPaid= pembayaran
+      .filter(p => p.anggota===anggotaPilih)
+      .reduce((acc,p)=>acc+p.jumlah,0);
+    const iuranPerBulan=50000;
+    if(totalPaid < iuranPerBulan){
+      alert('Harap bayar kekurangan via QRIS');
+      cekTunggakan(); // refresh info tunggakan
+      return;
+    }
+
+    const now= new Date();
+    pembayaran.push({anggota: anggotaPilih, jumlah, tanggal: now, kategori});
     localStorage.setItem('pembayaran', JSON.stringify(pembayaran));
     document.getElementById('jumlahBayar').value='';
     renderLaporan();
@@ -260,17 +289,15 @@
     alert('Pembayaran berhasil!');
   }
 
-  // Render laporan
   function renderLaporan() {
-    const tbody = document.querySelector('#tabelLaporan tbody');
+    const tbody= document.querySelector('#tabelLaporan tbody');
     tbody.innerHTML='';
-    const filterBulan = document.getElementById('filterBulan').value;
-    let totalBulanan = 0;
+    const filterBulan= document.getElementById('filterBulan').value;
+    let totalBulanan=0;
     pembayaran.forEach(p => {
-      const pDate = new Date(p.tanggal);
-      // Filter bulan
+      const pDate= new Date(p.tanggal);
       if(filterBulan){
-        const [tahun, bulan] = filterBulan.split('-');
+        const [tahun, bulan]= filterBulan.split('-');
         if(pDate.getFullYear()!==parseInt(tahun) || pDate.getMonth()!==parseInt(bulan)-1){
           return;
         }
@@ -279,33 +306,30 @@
         <tr>
           <td>${pDate.toLocaleString()}</td>
           <td>${p.anggota}</td>
+          <td>${p.kategori}</td>
           <td>Rp ${p.jumlah}</td>
           <td>
             <button class="btn-small" onclick="hapusPembayaran('${p.tanggal}')">Hapus</button>
             <button class="btn-small" onclick="editPembayaran('${p.tanggal}')">Edit</button>
           </td>
         </tr>`;
-      // Hitung total per bulan
-      if(!filterBulan) totalBulanan += p.jumlah;
+      if(!filterBulan) totalBulanan+=p.jumlah;
     });
-    // Update tren bulanan
     document.getElementById('trenBulanan').innerText='Rp '+totalBulanan;
   }
 
-  // Hapus pembayaran
   function hapusPembayaran(tanggalStr) {
     if(confirm('Hapus transaksi ini?')){
-      pembayaran = pembayaran.filter(p => p.tanggal!==tanggalStr);
+      pembayaran= pembayaran.filter(p => p.tanggal!==tanggalStr);
       localStorage.setItem('pembayaran', JSON.stringify(pembayaran));
       renderLaporan();
     }
   }
 
-  // Edit pembayaran
   function editPembayaran(tanggalStr) {
-    const p = pembayaran.find(p => p.tanggal===tanggalStr);
+    const p= pembayaran.find(p => p.tanggal===tanggalStr);
     if(p){
-      const newJumlah = prompt('Jumlah baru (Rp):', p.jumlah);
+      const newJumlah= prompt('Jumlah baru (Rp):', p.jumlah);
       if(newJumlah && !isNaN(newJumlah) && newJumlah>0){
         p.jumlah= parseInt(newJumlah);
         localStorage.setItem('pembayaran', JSON.stringify(pembayaran));
@@ -315,22 +339,20 @@
     }
   }
 
-  // Render statistik
   function renderStatistik() {
-    // Total pembayaran
-    let total = 0;
+    let total=0;
     pembayaran.forEach(p => total+=p.jumlah);
     document.getElementById('totalPembayaran').innerText='Rp '+total;
-    // Jumlah anggota
     document.getElementById('jumlahAnggota').innerText=anggota.length;
   }
 
-  // Reset semua data
   function resetData() {
     if(confirm('Yakin ingin reset semua data?')){
       localStorage.clear();
       anggota=[];
       pembayaran=[];
+      localStorage.removeItem('users');
+      loadUserData();
       renderDaftarAnggota();
       renderPilihanAnggota();
       renderLaporan();
@@ -338,16 +360,15 @@
     }
   }
 
-  // Export laporan lengkap ke CSV
   function exportLaporanCSV() {
-    let csv='Tanggal,Anggota,Jumlah\n';
+    let csv='Tanggal,Anggota,Kategori,Jumlah\n';
     pembayaran.forEach(p => {
-      csv+=`${new Date(p.tanggal).toLocaleString()},${p.anggota},${p.jumlah}\n`;
+      csv+=`${new Date(p.tanggal).toLocaleString()},${p.anggota},${p.kategori},${p.jumlah}\n`;
     });
-    const blob = new Blob([csv], {type:'text/csv'});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');
-    a.href=url;
+    const blob= new Blob([csv], {type:'text/csv'});
+    const url= URL.createObjectURL(blob);
+    const a= document.createElement('a');
+    a.href= url;
     a.download='laporan_iuran_lengkap.csv';
     a.click();
   }
@@ -359,6 +380,5 @@
   renderStatistik();
 
 </script>
-
 </body>
 </html>
