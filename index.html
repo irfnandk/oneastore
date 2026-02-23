@@ -3,9 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Manajemen Iuran Kas</title>
+<title>Manajemen Iuran Kas - Tanpa Login & Import</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <style>
   body {
     font-family: 'Inter', sans-serif;
@@ -77,73 +76,239 @@
 </head>
 <body>
 
-<h1>Manajemen Iuran Kas - Fitur Lengkap</h1>
+<h1>Manajemen Iuran Kas - Tanpa Login & Import</h1>
 
-<!-- Upload Excel -->
-<div class="section" id="importExcelSection">
+<!-- Input Pembayaran -->
+<div class="section" id="sectionPembayaran">
   <div class="card">
-    <h2>Impor Data Dari Excel</h2>
-    <input type="file" id="uploadExcel" />
-    <button onclick="importExcel()">Impor</button>
-  </div>
-</div>
-
-<!-- Login Sistem -->
-<div class="section" id="loginSection">
-  <div class="card">
-    <h2>Login Sistem</h2>
-    <input type="text" id="userName" placeholder="Username" />
-    <select id="userRole">
-      <option value="admin">Admin</option>
-      <option value="anggota">Anggota</option>
+    <h2>Input Pembayaran</h2>
+    <select id="selectAnggota">
+      <option value="">Pilih Anggota</option>
     </select>
-    <button onclick="login()">Login</button>
+    <input type="number" id="jumlahBayar" placeholder="Jumlah (Rp)" />
+    <select id="kategoriIuran">
+      <option value="Rutin">Kas Rutin</option>
+      <option value="Pribadi">Kas Pribadi</option>
+      <option value="Lainnya">Lainnya</option>
+    </select>
+    <button onclick="prosesPembayaran()">Bayar</button>
   </div>
 </div>
 
-<!-- Main App (Tersembunyi jika belum login) -->
-<div id="appSection" style="display:none;">
-  <h2 style="text-align:center;">Halo, <span id="namaUser"></span></h2>
-  <button style="float:right; margin-top:10px;" onclick="logout()">Logout</button>
-
-  <!-- Pengelolaan Anggota -->
-  <div class="section" id="sectionAnggota">
-    <div class="card">
-      <h2>Daftar dan Kelola Anggota</h2>
-      <input type="text" id="namaAnggota" placeholder="Nama Anggota Baru" />
-      <button onclick="tambahAnggota()">Tambah Anggota</button>
-      <table id="tabelAnggota">
-        <thead>
-          <tr>
-            <th>Nama</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+<!-- Statistik dan Pengingat -->
+<div class="section" id="sectionStatistik">
+  <div class="card">
+    <h2>Statistik dan Pengingat</h2>
+    <div class="stats" style="display:flex; gap:10px; flex-wrap:wrap;">
+      <div class="stat-box" style="flex:1; padding:10px; background:#e0f2fe; border-radius:8px;">
+        <h3 id="totalPembayaran">Rp 0</h3>
+        <p>Total Pembayaran</p>
+      </div>
+      <div class="stat-box" style="flex:1; padding:10px; background:#e0f2fe; border-radius:8px;">
+        <h3 id="jumlahAnggota">0</h3>
+        <p>Jumlah Anggota</p>
+      </div>
+      <div class="stat-box" style="flex:1; padding:10px; background:#e0f2fe; border-radius:8px;">
+        <h3 id="trenBulanan">Rp 0</h3>
+        <p>Tren Bulanan</p>
+      </div>
+    </div>
+    <div style="margin-top:15px;">
+      <button onclick="sendNotifikasi()">Kirim Notifikasi</button>
+      <button onclick="setPengingat()">Atur Pengingat</button>
     </div>
   </div>
+</div>
 
-  <!-- Input Pembayaran -->
-  <div class="section" id="sectionPembayaran">
-    <div class="card">
-      <h2>Input Pembayaran</h2>
-      <select id="selectAnggota">
-        <option value="">Pilih Anggota</option>
-      </select>
-      <input type="number" id="jumlahBayar" placeholder="Jumlah (Rp)" />
-      <select id="kategoriIuran">
-        <option value="Rutin">Kas Rutin</option>
-        <option value="Pribadi">Kas Pribadi</option>
-        <option value="Lainnya">Lainnya</option>
-      </select>
-      <button onclick="prosesPembayaran()">Bayar</button>
+<!-- Laporan & Pengelolaan -->
+<div class="section" id="sectionLaporan">
+  <div class="card">
+    <h2>Laporan Pembayaran & Pengelolaan</h2>
+    <div style="margin-bottom:10px;">
+      <button onclick="resetData()">Reset Data</button>
+      <button onclick="exportLaporanCSV()">Export Data Lengkap</button>
     </div>
+    <div>
+      <label for="filterBulan">Filter Bulan:</label>
+      <input type="month" id="filterBulan" onchange="renderLaporan()" />
+    </div>
+    <table id="tabelLaporan">
+      <thead>
+        <tr>
+          <th>Tanggal</th>
+          <th>Anggota</th>
+          <th>Kategori</th>
+          <th>Jumlah (Rp)</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </div>
+</div>
 
-  <!-- Statistik dan Pengingat -->
-  <div class="section" id="sectionStatistik">
-    <div class="card">
+<script>
+  // Data utama
+  let anggota = [
+    "Muhamad Wisnu",
+    "Uswatun Chasanah",
+    "Miftahul Qoir Tri Oktavian",
+    "Himmatul 'Ulya",
+    "Achmad Rozaq Ibrahim",
+    "Putri Titianian Sasilia",
+    "Jibril Muhamad Rizki",
+    "Aqbil Abdillah Faza",
+    "Rossi Valentino",
+    "Irfan Andika Pratama",
+    "Luna Agustin",
+    "Regita Cahyani",
+    "Billy Nathanael Wahyu P.",
+    "Anindya Esa Wahyuvida R.",
+    "Satria Bagus Putra H.",
+    "Lisa Rahma Aulia P.",
+    "M. Imam Ali Murtado",
+    "Mokhamad Agus Alfaizun",
+    "Olif Agustina",
+    "Wianda Pradipta Septiana",
+    "Jullia",
+    "Dwi Prasetyo"
+  ];
+
+  let pembayaran = [];
+
+  // Inisialisasi data dari localStorage jika ada
+  if(localStorage.getItem('pembayaran')){
+    pembayaran= JSON.parse(localStorage.getItem('pembayaran'));
+  }
+
+  // Render pilihan anggota
+  function renderPilihanAnggota() {
+    const select = document.getElementById('selectAnggota');
+    select.innerHTML='<option value="">Pilih Anggota</option>';
+    anggota.forEach(a => {
+      select.innerHTML+=`<option value="${a}">${a}</option>`;
+    });
+  }
+
+  // Proses pembayaran
+  function prosesPembayaran() {
+    const anggotaPilih = document.getElementById('selectAnggota').value;
+    const jumlah = parseInt(document.getElementById('jumlahBayar').value);
+    const kategori= document.getElementById('kategoriIuran').value;
+    if(!anggotaPilih || isNaN(jumlah) || jumlah<=0){
+      alert('Isi data dengan benar!');
+      return;
+    }
+    const now= new Date();
+    pembayaran.push({anggota: anggotaPilih, jumlah, tanggal: now, kategori});
+    localStorage.setItem('pembayaran', JSON.stringify(pembayaran));
+    document.getElementById('jumlahBayar').value='';
+    renderLaporan();
+    renderStatistik();
+    alert('Pembayaran berhasil!');
+  }
+
+  // Render laporan
+  function renderLaporan() {
+    const tbody= document.querySelector('#tabelLaporan tbody');
+    tbody.innerHTML='';
+    const filterBulan= document.getElementById('filterBulan').value;
+    let totalBulanan=0;
+    pembayaran.forEach(p => {
+      const pDate= new Date(p.tanggal);
+      if(filterBulan){
+        const [tahun, bulan]= filterBulan.split('-');
+        if(pDate.getFullYear()!==parseInt(tahun) || pDate.getMonth()!==parseInt(bulan)-1){
+          return;
+        }
+      }
+      tbody.innerHTML+=`
+        <tr>
+          <td>${pDate.toLocaleString()}</td>
+          <td>${p.anggota}</td>
+          <td>${p.kategori}</td>
+          <td>Rp ${p.jumlah}</td>
+          <td>
+            <button class="btn-small" onclick="hapusPembayaran('${p.tanggal}')">Hapus</button>
+            <button class="btn-small" onclick="editPembayaran('${p.tanggal}')">Edit</button>
+          </td>
+        </tr>`;
+      if(!filterBulan) totalBulanan+=p.jumlah;
+    });
+    document.getElementById('trenBulanan').innerText='Rp '+totalBulanan;
+  }
+
+  function hapusPembayaran(tanggalStr) {
+    if(confirm('Hapus transaksi ini?')){
+      pembayaran= pembayaran.filter(p => p.tanggal!==tanggalStr);
+      localStorage.setItem('pembayaran', JSON.stringify(pembayaran));
+      renderLaporan();
+    }
+  }
+
+  function editPembayaran(tanggalStr) {
+    const p= pembayaran.find(p => p.tanggal===tanggalStr);
+    if(p){
+      const newJumlah= prompt('Jumlah baru (Rp):', p.jumlah);
+      if(newJumlah && !isNaN(newJumlah) && newJumlah>0){
+        p.jumlah= parseInt(newJumlah);
+        localStorage.setItem('pembayaran', JSON.stringify(pembayaran));
+        renderLaporan();
+        renderStatistik();
+      }
+    }
+  }
+
+  // Render statistik
+  function renderStatistik() {
+    let total=0;
+    pembayaran.forEach(p => total+=p.jumlah);
+    document.getElementById('totalPembayaran').innerText='Rp '+total;
+    document.getElementById('jumlahAnggota').innerText=anggota.length;
+  }
+
+  // Reset data
+  function resetData() {
+    if(confirm('Yakin ingin reset semua data?')){
+      localStorage.clear();
+      pembayaran=[];
+      renderLaporan();
+      renderStatistik();
+    }
+  }
+
+  // Export CSV
+  function exportLaporanCSV() {
+    let csv='Tanggal,Anggota,Kategori,Jumlah\n';
+    pembayaran.forEach(p => {
+      csv+=`${new Date(p.tanggal).toLocaleString()},${p.anggota},${p.kategori},${p.jumlah}\n`;
+    });
+    const blob= new Blob([csv], {type:'text/csv'});
+    const url= URL.createObjectURL(blob);
+    const a= document.createElement('a');
+    a.href= url;
+    a.download='laporan_iuran_lengkap.csv';
+    a.click();
+  }
+
+  // Fungsi placeholder notifikasi dan pengingat
+  function sendNotifikasi() {
+    alert('Fungsi notifikasi belum terintegrasi dengan sistem pengingat.');
+  }
+  function setPengingat() {
+    const hari= prompt('Atur pengingat setiap hari (misalnya: 18:00):','18:00');
+    if(hari){
+      alert('Pengingat diset untuk setiap hari jam '+hari+'. (Fitur ini perlu integrasi server)');
+    }
+  }
+
+  // Inisialisasi
+  renderPilihanAnggota();
+  renderLaporan();
+  renderStatistik();
+</script>
+</body>
+</html>    <div class="card">
       <h2>Statistik dan Pengingat</h2>
       <div class="stats" style="display:flex; gap:10px; flex-wrap:wrap;">
         <div class="stat-box" style="flex:1; padding:10px; background:#e0f2fe; border-radius:8px;">
@@ -747,4 +912,5 @@
 </script>
 </body>
 </html>
+
 
