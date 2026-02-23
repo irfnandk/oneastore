@@ -72,6 +72,23 @@
       flex-direction: column;
     }
   }
+  /* QR code overlay */
+  #qrOverlay {
+    display: none;
+    position: fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+  }
+  #qrContainer {
+    background: #fff;
+    padding:20px;
+    border-radius:10px;
+    text-align:center;
+  }
 </style>
 </head>
 <body>
@@ -144,6 +161,191 @@
       </thead>
       <tbody></tbody>
     </table>
+  </div>
+</div>
+
+<!-- QR Code Overlay -->
+<div id="qrOverlay">
+  <div id="qrContainer">
+    <h3>Scan QR untuk Pembayaran</h3>
+    <img id="qrCodeImage" src="" alt="QR Code" style="width:200px; height:200px;" />
+    <div style="margin-top:10px;">
+      <button onclick="closeQR()">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Data utama
+  let anggota = [
+    "Muhamad Wisnu",
+    "Uswatun Chasanah",
+    "Miftahul Qoir Tri Oktavian",
+    "Himmatul 'Ulya",
+    "Achmad Rozaq Ibrahim",
+    "Putri Titianian Sasilia",
+    "Jibril Muhamad Rizki",
+    "Aqbil Abdillah Faza",
+    "Rossi Valentino",
+    "Irfan Andika Pratama",
+    "Luna Agustin",
+    "Regita Cahyani",
+    "Billy Nathanael Wahyu P.",
+    "Anindya Esa Wahyuvida R.",
+    "Satria Bagus Putra H.",
+    "Lisa Rahma Aulia P.",
+    "M. Imam Ali Murtado",
+    "Mokhamad Agus Alfaizun",
+    "Olif Agustina",
+    "Wianda Pradipta Septiana",
+    "Jullia",
+    "Dwi Prasetyo"
+  ];
+
+  let pembayaran = [];
+
+  // Inisialisasi data dari localStorage jika ada
+  if(localStorage.getItem('pembayaran')){
+    pembayaran= JSON.parse(localStorage.getItem('pembayaran'));
+  }
+
+  // Render pilihan anggota
+  function renderPilihanAnggota() {
+    const select = document.getElementById('selectAnggota');
+    select.innerHTML='<option value="">Pilih Anggota</option>';
+    anggota.forEach(a => {
+      select.innerHTML+=`<option value="${a}">${a}</option>`;
+    });
+  }
+
+  // Proses pembayaran
+function prosesPembayaran() {
+  const anggotaPilih = document.getElementById('selectAnggota').value;
+  const jumlah = parseInt(document.getElementById('jumlahBayar').value);
+  const kategori= document.getElementById('kategoriIuran').value;
+  if(!anggotaPilih || isNaN(jumlah) || jumlah<=0){
+    alert('Isi data dengan benar!');
+    return;
+  }
+  const now= new Date();
+  pembayaran.push({anggota: anggotaPilih, jumlah, tanggal: now, kategori});
+  localStorage.setItem('pembayaran', JSON.stringify(pembayaran));
+  document.getElementById('jumlahBayar').value='';
+  renderLaporan();
+  renderStatistik();
+  // Tampilkan QR code
+  tampilkanQR('https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=Bayar%20dengan%20kode%20ini');
+  alert('Pembayaran berhasil! Scan QR Code di atas.');
+}
+
+// Tampilkan QR
+function tampilkanQR(url){
+  document.getElementById('qrCodeImage').src= url;
+  document.getElementById('qrOverlay').style.display='flex';
+}
+function closeQR(){
+  document.getElementById('qrOverlay').style.display='none';
+}
+
+// Fungsi notifikasi dan pengingat
+function sendNotifikasi() {
+  alert('Fungsi notifikasi belum terintegrasi.');
+}
+function setPengingat() {
+  const waktu= prompt('Atur pengingat setiap hari (misalnya: 18:00):','18:00');
+  if(waktu){
+    alert('Pengingat diset untuk setiap hari jam '+waktu+'. (Fitur ini membutuhkan pengembangan server)');
+  }
+}
+
+// Render laporan
+function renderLaporan() {
+  const tbody= document.querySelector('#tabelLaporan tbody');
+  tbody.innerHTML='';
+  const filterBulan= document.getElementById('filterBulan').value;
+  let totalBulanan=0;
+  pembayaran.forEach(p => {
+    const pDate= new Date(p.tanggal);
+    if(filterBulan){
+      const [tahun, bulan]= filterBulan.split('-');
+      if(pDate.getFullYear()!==parseInt(tahun) || pDate.getMonth()!==parseInt(bulan)-1){
+        return;
+      }
+    }
+    tbody.innerHTML+=`
+      <tr>
+        <td>${pDate.toLocaleString()}</td>
+        <td>${p.anggota}</td>
+        <td>${p.kategori}</td>
+        <td>Rp ${p.jumlah}</td>
+        <td>
+          <button class="btn-small" onclick="hapusPembayaran('${p.tanggal}')">Hapus</button>
+          <button class="btn-small" onclick="editPembayaran('${p.tanggal}')">Edit</button>
+        </td>
+      </tr>`;
+    if(!filterBulan) totalBulanan+=p.jumlah;
+  });
+  document.getElementById('trenBulanan').innerText='Rp '+totalBulanan;
+}
+
+// Hapus dan Edit
+function hapusPembayaran(tanggalStr) {
+  if(confirm('Hapus transaksi ini?')){
+    pembayaran= pembayaran.filter(p => p.tanggal!==tanggalStr);
+    localStorage.setItem('pembayaran', JSON.stringify(pembayaran));
+    renderLaporan();
+  }
+}
+function editPembayaran(tanggalStr) {
+  const p= pembayaran.find(p => p.tanggal===tanggalStr);
+  if(p){
+    const newJumlah= prompt('Jumlah baru (Rp):', p.jumlah);
+    if(newJumlah && !isNaN(newJumlah) && newJumlah>0){
+      p.jumlah= parseInt(newJumlah);
+      localStorage.setItem('pembayaran', JSON.stringify(pembayaran));
+      renderLaporan();
+      renderStatistik();
+    }
+  }
+}
+
+// Statistik
+function renderStatistik() {
+  let total=0;
+  pembayaran.forEach(p => total+=p.jumlah);
+  document.getElementById('totalPembayaran').innerText='Rp '+total;
+  document.getElementById('jumlahAnggota').innerText=anggota.length;
+}
+
+// Reset & Export
+function resetData() {
+  if(confirm('Yakin ingin reset semua data?')){
+    localStorage.clear();
+    pembayaran=[];
+    renderLaporan();
+    renderStatistik();
+  }
+}
+function exportLaporanCSV() {
+  let csv='Tanggal,Anggota,Kategori,Jumlah\n';
+  pembayaran.forEach(p => {
+    csv+=`${new Date(p.tanggal).toLocaleString()},${p.anggota},${p.kategori},${p.jumlah}\n`;
+  });
+  const blob= new Blob([csv], {type:'text/csv'});
+  const url= URL.createObjectURL(blob);
+  const a= document.createElement('a');
+  a.href= url;
+  a.download='laporan_iuran_lengkap.csv';
+  a.click();
+}
+
+// Inisialisasi
+renderPilihanAnggota();
+renderLaporan();
+renderStatistik();
+</script>
+</body>
+</html>    </table>
   </div>
 </div>
 
@@ -912,5 +1114,6 @@
 </script>
 </body>
 </html>
+
 
 
