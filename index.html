@@ -1,320 +1,363 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PTI One Class | Portofolio Kelas</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Manajemen Iuran Kas - Versi Lengkap</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet" />
 <style>
-:root{
-  --primary:#0F4C81;
-  --bg:#F8FAFC;
-  --card:#FFFFFF;
-  --text:#0F172A;
-  --muted:#64748B;
-  --border:#E5E7EB;
-}
-body.dark{
-  --bg:#0B1220;
-  --card:#111827;
-  --text:#F9FAFB;
-  --muted:#9CA3AF;
-  --border:#1F2937;
-}
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Inter;background:var(--bg);color:var(--text)}
-header{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--border);z-index:100}
-body.dark header{background:#111}
-.nav{max-width:1200px;margin:auto;padding:18px;display:flex;justify-content:space-between;align-items:center}
-.logo{font-family:Poppins;font-weight:700;color:var(--primary)}
-.nav-menu{display:flex;gap:20px;align-items:center}
-.nav-menu a{font-size:14px;color:var(--muted);cursor:pointer}
-.toggle{padding:6px 12px;border:1px solid var(--border);border-radius:999px;cursor:pointer}
-section{max-width:1200px;margin:80px auto;padding:0 20px}
-.members{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px}
-.member{background:var(--card);padding:20px;border-radius:16px;text-align:center;border:1px solid var(--border)}
-.badge{padding:4px 8px;border-radius:999px;font-size:11px;color:#fff}
-.ketua{background:#2563EB}
-.sekretaris{background:#059669}
-.bendahara{background:#D97706}
-.anggota{background:#64748B}
-.news-card{background:var(--card);padding:20px;border-radius:16px;margin-bottom:20px;border:1px solid var(--border)}
-.btn{padding:8px 14px;border:none;border-radius:8px;background:var(--primary);color:white;cursor:pointer}
-input,select{width:100%;padding:8px;margin:6px 0;border-radius:8px;border:1px solid var(--border)}
-#dashboard{display:none}
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f0f4f8;
+    margin: 0;
+    padding: 20px;
+    color: #0f172a;
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .section {
+    margin-bottom: 40px;
+  }
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    padding: 20px;
+  }
+  .card h2 {
+    margin-top: 0;
+  }
+  input, select, button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    font-family: 'Inter', sans-serif;
+  }
+  button {
+    background-color: #0F4C81;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    margin-top: 15px;
+  }
+  button:hover {
+    background-color: #155e75;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  th, td {
+    border: 1px solid #e5e7eb;
+    padding: 8px;
+    text-align: center;
+  }
+  th {
+    background-color: #0f4c81;
+    color: #fff;
+  }
+  .btn-small {
+    padding: 4px 8px;
+    font-size: 0.8em;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  /* Untuk statistik dan ringkasan */
+  .stats {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .stat-box {
+    flex: 1;
+    min-width: 150px;
+    background: #e0f2fe;
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+  }
+  .stat-box h3 {
+    margin: 0;
+    font-size: 1.2em;
+  }
 </style>
 </head>
-
 <body>
 
-<header>
-<div class="nav">
-<div class="logo">PTI One Class</div>
-<div class="nav-menu">
-<a href="#anggota">Anggota</a>
-<a id="notifTunggakan"></a>
-<a onclick="openLogin()">Login</a>
-<div class="toggle" onclick="toggleDark()">Dark</div>
-</div>
-</div>
-</header>
+<h1>Manajemen Iuran Kas - Versi Lengkap</h1>
 
-<section>
-<h1>Website Resmi PTI One Class</h1>
-<p>Dashboard kelas modern.</p>
-</section>
-
-<section id="anggota">
-<h2>Struktur Kelas</h2>
-<p id="jumlahAnggota"></p>
-<div class="members" id="members"></div>
-</section>
-
-<section id="dashboard">
-<h2>Dashboard Keuangan</h2>
-<button onclick="logout()" class="btn" style="background:#ef4444">Logout</button>
-
-<div class="news-card">
-<h3>Total Saldo</h3>
-<h2 id="totalKas">Rp 0</h2>
+<!-- Manajemen Anggota -->
+<div class="section">
+  <div class="card">
+    <h2>Daftar dan Kelola Anggota</h2>
+    <input type="text" id="namaAnggota" placeholder="Nama Anggota Baru" />
+    <button onclick="tambahAnggota()">Tambah Anggota</button>
+    <table id="tabelAnggota">
+      <thead>
+        <tr>
+          <th>Nama</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 </div>
 
-<div class="news-card">
-<h3>Tambah Transaksi</h3>
-<input id="namaTransaksi" placeholder="Nama">
-<select id="jenisTransaksi">
-<option value="masuk">Kas Masuk</option>
-<option value="keluar">Kas Keluar</option>
-</select>
-<input id="jumlahTransaksi" type="number" placeholder="Jumlah">
-<button onclick="tambahKas()" class="btn">Simpan</button>
+<!-- Form Pembayaran -->
+<div class="section">
+  <div class="card">
+    <h2>Input Pembayaran</h2>
+    <select id="selectAnggota">
+      <option value="">Pilih Anggota</option>
+    </select>
+    <input type="number" id="jumlahBayar" placeholder="Jumlah (Rp)" />
+    <button onclick="prosesPembayaran()">Bayar</button>
+  </div>
 </div>
 
-<div class="news-card">
-<h3>Riwayat Kas</h3>
-<div id="riwayatKas"></div>
+<!-- Statistik dan Ringkasan -->
+<div class="section">
+  <div class="card">
+    <h2>Statistik dan Ringkasan</h2>
+    <div class="stats">
+      <div class="stat-box">
+        <h3 id="totalPembayaran">Rp 0</h3>
+        <p>Total Pembayaran</p>
+      </div>
+      <div class="stat-box">
+        <h3 id="jumlahAnggota">0</h3>
+        <p>Jumlah Anggota</p>
+      </div>
+      <div class="stat-box">
+        <h3 id="trenBulanan">Rp 0</h3>
+        <p>Tren Bulanan</p>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="news-card">
-<h3>Grafik Kas</h3>
-<canvas id="grafikKas"></canvas>
-</div>
-
-<div class="news-card">
-<h3>Status Iuran</h3>
-<div id="listIuran"></div>
-<button onclick="exportCSV()" class="btn">Export CSV</button>
-</div>
-
-<div class="news-card">
-<h3>Riwayat Pembayaran</h3>
-<div id="riwayatPembayaran"></div>
-</div>
-
-<div class="news-card">
-<h3>Statistik</h3>
-<canvas id="pieChart"></canvas>
-</div>
-</section>
-
-<!-- LOGIN MODAL -->
-<div id="loginModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);justify-content:center;align-items:center">
-<div style="background:white;padding:30px;border-radius:16px;width:90%;max-width:400px">
-<h3>Login</h3>
-<input id="loginUser" placeholder="Username">
-<input id="loginPass" type="password" placeholder="Password">
-<button onclick="login()" class="btn" style="width:100%">Login</button>
-</div>
-</div>
-
-<!-- PAYMENT MODAL -->
-<div id="paymentModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);justify-content:center;align-items:center">
-<div style="background:white;padding:25px;border-radius:16px;width:90%;max-width:400px">
-<h3>Pembayaran Iuran</h3>
-<p id="payNama"></p>
-<input id="payNominal" type="number" placeholder="Nominal">
-<input id="payBukti" type="file" accept="image/*">
-<img id="previewBukti" style="width:100%;margin-top:10px;display:none;border-radius:10px"/>
-<button onclick="submitPayment()" class="btn" style="width:100%;margin-top:10px">Simpan</button>
-<button onclick="closePayment()" class="btn" style="width:100%;margin-top:6px;background:#ccc;color:black">Batal</button>
-</div>
+<!-- Laporan & Pengelolaan Transaksi -->
+<div class="section">
+  <div class="card">
+    <h2>Laporan Pembayaran & Pengelolaan</h2>
+    <div style="display:flex; gap:10px; margin-bottom:10px;">
+      <button onclick="resetData()">Reset Data</button>
+      <button onclick="exportLaporanCSV()">Export Seluruh Data</button>
+    </div>
+    <div>
+      <label for="filterBulan">Filter Bulan:</label>
+      <input type="month" id="filterBulan" onchange="renderLaporan()" />
+    </div>
+    <table id="tabelLaporan">
+      <thead>
+        <tr>
+          <th>Tanggal</th>
+          <th>Anggota</th>
+          <th>Jumlah (Rp)</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 </div>
 
 <script>
-/* DARK MODE */
-function toggleDark(){
-document.body.classList.toggle('dark');
-localStorage.setItem('dark',document.body.classList.contains('dark'));
-}
-if(localStorage.getItem('dark')==="true") document.body.classList.add('dark');
+  // Data utama
+  let anggota = JSON.parse(localStorage.getItem('anggota')) || [];
+  let pembayaran = JSON.parse(localStorage.getItem('pembayaran')) || [];
 
-/* DATA */
-let anggota=[
-{nama:"IMAM",jabatan:"Ketua Kelas"},
-{nama:"BILLY",jabatan:"Wakil Ketua"},
-{nama:"JULIA",jabatan:"Sekretaris"},
-{nama:"REGITA",jabatan:"Bendahara"},
-{nama:"ANGGOTA 1",jabatan:"Anggota"},
-{nama:"ANGGOTA 2",jabatan:"Anggota"}
-];
+  // Fungsi Tambah Anggota
+  function tambahAnggota() {
+    const nama = document.getElementById('namaAnggota').value.trim();
+    if(!nama){
+      alert('Isi nama anggota!');
+      return;
+    }
+    if(anggota.includes(nama)){
+      alert('Nama sudah terdaftar!');
+      return;
+    }
+    anggota.push(nama);
+    localStorage.setItem('anggota', JSON.stringify(anggota));
+    document.getElementById('namaAnggota').value='';
+    renderDaftarAnggota();
+    renderPilihanAnggota();
+    renderStatistik();
+  }
 
-function renderAnggota(){
-members.innerHTML="";
-anggota.forEach(a=>{
-members.innerHTML+=`
-<div class="member">
-<h4>${a.nama}</h4>
-<span class="badge anggota">${a.jabatan}</span>
-</div>`;
-});
-jumlahAnggota.innerText="Total: "+anggota.length;
-}
-renderAnggota();
+  // Render daftar anggota
+  function renderDaftarAnggota() {
+    const tbody = document.querySelector('#tabelAnggota tbody');
+    tbody.innerHTML='';
+    anggota.forEach((a, index) => {
+      tbody.innerHTML+=`
+        <tr>
+          <td>${a}</td>
+          <td>
+            <button class="btn-small" onclick="editAnggota('${a}')">Edit</button>
+            <button class="btn-small" onclick="hapusAnggota('${a}')">Hapus</button>
+          </td>
+        </tr>`;
+    });
+  }
 
-/* LOGIN */
-let users=[{username:"admin",password:"ptiadmin"},{username:"viewer",password:"ptiuser"}];
-let currentUser=JSON.parse(localStorage.getItem("ptiUser"))||null;
+  function hapusAnggota(nama) {
+    if(confirm('Hapus anggota ini?')){
+      anggota = anggota.filter(a => a!==nama);
+      localStorage.setItem('anggota', JSON.stringify(anggota));
+      renderDaftarAnggota();
+      renderPilihanAnggota();
+      renderStatistik();
+    }
+  }
 
-function openLogin(){loginModal.style.display="flex";}
-function login(){
-let found=users.find(x=>x.username===loginUser.value && x.password===loginPass.value);
-if(found){
-currentUser=found;
-localStorage.setItem("ptiUser",JSON.stringify(found));
-loginModal.style.display="none";
-checkAccess();
-}
-}
-function logout(){localStorage.removeItem("ptiUser");location.reload();}
-function checkAccess(){dashboard.style.display=currentUser?"block":"none";}
-checkAccess();
+  function editAnggota(nama) {
+    const newNama = prompt('Edit nama anggota:', nama);
+    if(newNama){
+      newNama.trim();
+      if(newNama && !anggota.includes(newNama)){
+        // Update di array
+        anggota = anggota.map(a => a===nama ? newNama : a);
+        localStorage.setItem('anggota', JSON.stringify(anggota));
+        renderDaftarAnggota();
+        renderPilihanAnggota();
+      } else {
+        alert('Nama tidak valid atau sudah terdaftar!');
+      }
+    }
+  }
 
-/* KAS */
-let kas=JSON.parse(localStorage.getItem("kasPTI"))||[];
-function tambahKas(){
-kas.push({nama:namaTransaksi.value,jenis:jenisTransaksi.value,jumlah:parseInt(jumlahTransaksi.value),tanggal:new Date()});
-localStorage.setItem("kasPTI",JSON.stringify(kas));
-renderKas();
-}
-function renderKas(){
-let total=0;
-riwayatKas.innerHTML="";
-kas.forEach(k=>{
-if(k.jenis==="masuk") total+=k.jumlah; else total-=k.jumlah;
-riwayatKas.innerHTML+=`${k.nama} - ${k.jenis} - Rp ${k.jumlah}<br>`;
-});
-totalKas.innerText="Rp "+total;
-renderChart();
-}
-function renderChart(){
-let bulan={};
-kas.forEach(k=>{
-let b=new Date(k.tanggal).getMonth();
-bulan[b]=(bulan[b]||0)+(k.jenis==="masuk"?k.jumlah:-k.jumlah);
-});
-if(window.barChart) window.barChart.destroy();
-window.barChart=new Chart(grafikKas,{type:"bar",data:{labels:Object.keys(bulan),datasets:[{label:"Kas",data:Object.values(bulan)}]}});
-}
-renderKas();
+  // Render pilihan anggota di form pembayaran
+  function renderPilihanAnggota() {
+    const select = document.getElementById('selectAnggota');
+    select.innerHTML='<option value="">Pilih Anggota</option>';
+    anggota.forEach(a => {
+      select.innerHTML+=`<option value="${a}">${a}</option>`;
+    });
+  }
 
-/* IURAN + RIWAYAT */
-let iuran=JSON.parse(localStorage.getItem("iuran"))||{};
-let riwayatPembayaran=JSON.parse(localStorage.getItem("riwayatBayar"))||[];
-let target=50000;
-let paymentTarget="";
-let buktiBase64="";
+  // Proses pembayaran
+  function prosesPembayaran() {
+    const anggotaPilih = document.getElementById('selectAnggota').value;
+    const jumlah = parseInt(document.getElementById('jumlahBayar').value);
+    if(!anggotaPilih || isNaN(jumlah) || jumlah<=0){
+      alert('Isi data dengan benar!');
+      return;
+    }
+    const now = new Date();
+    pembayaran.push({anggota: anggotaPilih, jumlah, tanggal: now});
+    localStorage.setItem('pembayaran', JSON.stringify(pembayaran));
+    document.getElementById('jumlahBayar').value='';
+    renderLaporan();
+    renderStatistik();
+    alert('Pembayaran berhasil!');
+  }
 
-function renderIuran(){
-listIuran.innerHTML="";
-let belum=0;
-anggota.forEach(a=>{
-if(!iuran[a.nama]) iuran[a.nama]=0;
-let lunas=iuran[a.nama]>=target;
-if(!lunas) belum++;
-let warna=lunas?"#16a34a":"#dc2626";
-let bg=lunas?"#dcfce7":"#fee2e2";
-listIuran.innerHTML+=`
-<div style="margin-bottom:10px;padding:8px;border-radius:8px;background:${bg};border:1px solid ${warna}">
-<strong>${a.nama}</strong><br>
-<span style="color:${warna};font-weight:bold">${lunas?"LUNAS":"NUNGGAK"}</span>
-(Rp ${iuran[a.nama]} / Rp ${target})
-<button onclick="openPayment('${a.nama}')" style="margin-left:10px;padding:4px 8px;border:none;background:#2563EB;color:white;border-radius:6px;font-size:12px">Bayar</button>
-</div>`;
-});
-notifTunggakan.innerText=belum>0?"🔴 "+belum+" Nunggak":"🟢 Semua Lunas";
-renderPie();
-}
-renderIuran();
+  // Render laporan
+  function renderLaporan() {
+    const tbody = document.querySelector('#tabelLaporan tbody');
+    tbody.innerHTML='';
+    const filterBulan = document.getElementById('filterBulan').value;
+    let totalBulanan = 0;
+    pembayaran.forEach(p => {
+      const pDate = new Date(p.tanggal);
+      // Filter bulan
+      if(filterBulan){
+        const [tahun, bulan] = filterBulan.split('-');
+        if(pDate.getFullYear()!==parseInt(tahun) || pDate.getMonth()!==parseInt(bulan)-1){
+          return;
+        }
+      }
+      tbody.innerHTML+=`
+        <tr>
+          <td>${pDate.toLocaleString()}</td>
+          <td>${p.anggota}</td>
+          <td>Rp ${p.jumlah}</td>
+          <td>
+            <button class="btn-small" onclick="hapusPembayaran('${p.tanggal}')">Hapus</button>
+            <button class="btn-small" onclick="editPembayaran('${p.tanggal}')">Edit</button>
+          </td>
+        </tr>`;
+      // Hitung total per bulan
+      if(!filterBulan) totalBulanan += p.jumlah;
+    });
+    // Update tren bulanan
+    document.getElementById('trenBulanan').innerText='Rp '+totalBulanan;
+  }
 
-function openPayment(nama){paymentTarget=nama;payNama.innerText="Nama: "+nama;paymentModal.style.display="flex";}
-function closePayment(){paymentModal.style.display="none";payNominal.value="";previewBukti.style.display="none";}
+  // Hapus pembayaran
+  function hapusPembayaran(tanggalStr) {
+    if(confirm('Hapus transaksi ini?')){
+      pembayaran = pembayaran.filter(p => p.tanggal!==tanggalStr);
+      localStorage.setItem('pembayaran', JSON.stringify(pembayaran));
+      renderLaporan();
+    }
+  }
 
-payBukti.addEventListener("change",e=>{
-let file=e.target.files[0];
-if(!file) return;
-let reader=new FileReader();
-reader.onload=()=>{buktiBase64=reader.result;previewBukti.src=buktiBase64;previewBukti.style.display="block";};
-reader.readAsDataURL(file);
-});
+  // Edit pembayaran
+  function editPembayaran(tanggalStr) {
+    const p = pembayaran.find(p => p.tanggal===tanggalStr);
+    if(p){
+      const newJumlah = prompt('Jumlah baru (Rp):', p.jumlah);
+      if(newJumlah && !isNaN(newJumlah) && newJumlah>0){
+        p.jumlah= parseInt(newJumlah);
+        localStorage.setItem('pembayaran', JSON.stringify(pembayaran));
+        renderLaporan();
+        renderStatistik();
+      }
+    }
+  }
 
-function submitPayment(){
-let nominal=parseInt(payNominal.value);
-if(!nominal||nominal<=0) return alert("Nominal tidak valid");
-iuran[paymentTarget]=(iuran[paymentTarget]||0)+nominal;
-kas.push({nama:"Iuran - "+paymentTarget,jenis:"masuk",jumlah:nominal,tanggal:new Date()});
-riwayatPembayaran.push({nama:paymentTarget,jumlah:nominal,tanggal:new Date().toLocaleString(),bukti:buktiBase64});
-localStorage.setItem("iuran",JSON.stringify(iuran));
-localStorage.setItem("kasPTI",JSON.stringify(kas));
-localStorage.setItem("riwayatBayar",JSON.stringify(riwayatPembayaran));
-renderIuran();renderKas();renderRiwayat();closePayment();
-}
+  // Render statistik
+  function renderStatistik() {
+    // Total pembayaran
+    let total = 0;
+    pembayaran.forEach(p => total+=p.jumlah);
+    document.getElementById('totalPembayaran').innerText='Rp '+total;
+    // Jumlah anggota
+    document.getElementById('jumlahAnggota').innerText=anggota.length;
+  }
 
-function renderRiwayat(){
-riwayatPembayaranDiv=document.getElementById("riwayatPembayaran");
-riwayatPembayaranDiv.innerHTML="";
-riwayatPembayaran.forEach((r,i)=>{
-riwayatPembayaranDiv.innerHTML+=`
-<div style="border-bottom:1px solid #ccc;padding:8px 0">
-<strong>${r.nama}</strong> - Rp ${r.jumlah}<br>
-<small>${r.tanggal}</small><br>
-${r.bukti?`<img src="${r.bukti}" style="width:100px;border-radius:6px">`:""}
-<button onclick="hapus(${i})" style="background:#ef4444;color:white;border:none;padding:4px 8px;border-radius:6px;font-size:12px;margin-top:5px">Hapus</button>
-</div>`;
-});
-}
-renderRiwayat();
+  // Reset semua data
+  function resetData() {
+    if(confirm('Yakin ingin reset semua data?')){
+      localStorage.clear();
+      anggota=[];
+      pembayaran=[];
+      renderDaftarAnggota();
+      renderPilihanAnggota();
+      renderLaporan();
+      renderStatistik();
+    }
+  }
 
-function hapus(i){
-let data=riwayatPembayaran[i];
-iuran[data.nama]-=data.jumlah;
-let indexKas=kas.findIndex(k=>k.nama==="Iuran - "+data.nama && k.jumlah===data.jumlah);
-if(indexKas!==-1) kas.splice(indexKas,1);
-riwayatPembayaran.splice(i,1);
-localStorage.setItem("riwayatBayar",JSON.stringify(riwayatPembayaran));
-localStorage.setItem("iuran",JSON.stringify(iuran));
-localStorage.setItem("kasPTI",JSON.stringify(kas));
-renderIuran();renderKas();renderRiwayat();
-}
+  // Export laporan lengkap ke CSV
+  function exportLaporanCSV() {
+    let csv='Tanggal,Anggota,Jumlah\n';
+    pembayaran.forEach(p => {
+      csv+=`${new Date(p.tanggal).toLocaleString()},${p.anggota},${p.jumlah}\n`;
+    });
+    const blob = new Blob([csv], {type:'text/csv'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;
+    a.download='laporan_iuran_lengkap.csv';
+    a.click();
+  }
 
-function renderPie(){
-let lunas=0,belum=0;
-anggota.forEach(a=>{if(iuran[a.nama]>=target) lunas++; else belum++;});
-if(window.pieChart) window.pieChart.destroy();
-window.pieChart=new Chart(pieChart,{type:"pie",data:{labels:["Lunas","Belum"],datasets:[{data:[lunas,belum]}]}});
-}
+  // Inisialisasi
+  renderDaftarAnggota();
+  renderPilihanAnggota();
+  renderLaporan();
+  renderStatistik();
 
-function exportCSV(){
-let data="Nama,Bayar\n";
-anggota.forEach(a=>{data+=`${a.nama},${iuran[a.nama]||0}\n`;});
-let blob=new Blob([data],{type:"text/csv"});
-let link=document.createElement("a");
-link.href=URL.createObjectURL(blob);
-link.download="iuran_pti.csv";
-link.click();
-}
 </script>
 
 </body>
